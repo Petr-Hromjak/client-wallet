@@ -72,6 +72,15 @@ public class WalletService {
   }
 
   /**
+   * Retrieves a list of all wallets.
+   *
+   * @return A list of all {@link Wallet} objects stored in the system.
+   */
+  public List<Wallet> list() {
+    return walletRepository.findAll();
+  }
+
+  /**
    * Deposits money into the specified wallet.
    * <p>
    * The deposit operation checks that the currency of the request matches the wallet's currency.

@@ -23,6 +23,7 @@ import java.util.UUID;
  * These operations include creating a wallet, retrieving wallet details, depositing funds, withdrawing funds,
  * transferring funds between wallets, and fetching transaction history.
  */
+@CrossOrigin(origins = "${cors.allowedOrigins}")
 @RestController
 @RequestMapping("/wallet")
 @Validated
@@ -62,6 +63,16 @@ public class WalletController {
   @GetMapping("/get")
   public ResponseEntity<Wallet> get(@ValidWalletId @RequestParam UUID walletId) {
     return ResponseEntity.ok(walletService.get(walletId));
+  }
+
+  /**
+   * Retrieves a list of all wallets.
+   *
+   * @return ResponseEntity containing a list of all wallets.
+   */
+  @GetMapping("/list")
+  public ResponseEntity<List<Wallet>> listWallets() {
+    return ResponseEntity.ok(walletService.list());
   }
 
   /**
