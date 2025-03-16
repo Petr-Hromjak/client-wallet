@@ -2,6 +2,8 @@ package com.clientwallet.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,6 +43,7 @@ public class Transaction {
    */
   @ManyToOne
   @JoinColumn(name = "sender_wallet_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private Wallet senderWallet;
 
   /**
@@ -52,6 +55,7 @@ public class Transaction {
    */
   @ManyToOne
   @JoinColumn(name = "receiver_wallet_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private Wallet receiverWallet;
 
   /**
