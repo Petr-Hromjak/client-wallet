@@ -1,9 +1,17 @@
 import { Container, Title } from '@mantine/core';
 import WalletList from '@/components/WalletList';
 import CreateWalletForm from '@/components/CreateWalletForm';
-import {WalletProvider} from "@/context/WalletContext";
+import { WalletProvider } from '@/context/WalletContext';
 
-export default function WalletPage() {
+/**
+ * WalletPage Component
+ *
+ * This page allows users to create new wallets and view the list of existing wallets.
+ * It wraps `CreateWalletForm` and `WalletList` inside `WalletProvider` to ensure wallet data is accessible.
+ *
+ * @returns {JSX.Element} The wallet page UI
+ */
+export default function WalletPage(): JSX.Element {
     return (
         <WalletProvider>
             <Container size="sm" py="xl">
@@ -12,7 +20,13 @@ export default function WalletPage() {
                 </Title>
                 <CreateWalletForm />
             </Container>
-            <WalletList />
+
+            <Container size="sm" py="xl">
+                <Title order={2} mb="lg">
+                    Wallet List
+                </Title>
+                <WalletList />
+            </Container>
         </WalletProvider>
     );
 }

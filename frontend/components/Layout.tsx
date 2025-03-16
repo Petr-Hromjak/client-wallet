@@ -1,14 +1,23 @@
-import { AppShell, Burger, Group, NavLink } from '@mantine/core';
+import { AppShell, Burger, Group, NavLink, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Link from 'next/link';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 
-const navLinks = [
+/** Navigation links for the sidebar */
+const navLinks: { label: string; href: string }[] = [
     { label: 'Wallets', href: '/wallets' },
-    { label: 'Transaction', href: '/transaction' }, // Fixed: Correct plural naming
+    { label: 'Transactions', href: '/transactions' }, // Fixed plural naming
 ];
 
+/**
+ * Layout component for the application.
+ * Provides a navigation sidebar, header, and main content area.
+ *
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to render in the main area
+ */
 export default function Layout({ children }: { children: React.ReactNode }) {
+    // Handle mobile and desktop navbar toggling
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
@@ -22,23 +31,33 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }}
             padding="md"
         >
-            {/* Header */}
+            {/* Header Section */}
             <AppShell.Header>
                 <Group h="100%" px="md" justify="space-between">
                     <Group>
                         <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
                         <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-                        <span>Client Wallet App</span>
+                        <Text size="lg" fw={500}>Client Wallet App</Text>
                     </Group>
                     <ColorSchemeToggle />
                 </Group>
             </AppShell.Header>
+
+            {/* Sidebar Navigation */}
             <AppShell.Navbar p="md">
-                <span>Navigation</span>
+                <Text size="sm" fw={500} mb="sm">Navigation</Text>
                 {navLinks.map((link) => (
-                    <NavLink key={link.href} component={Link} href={link.href} label={link.label}/>
+                    <NavLink
+                        key={link.href}
+                        component={Link}
+                        href={link.href}
+                        label={link.label}
+                        active={false} // Ensure proper highlighting logic if needed
+                    />
                 ))}
             </AppShell.Navbar>
+
+            {/* Main Content */}
             <AppShell.Main>{children}</AppShell.Main>
         </AppShell>
     );

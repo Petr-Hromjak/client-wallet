@@ -3,28 +3,63 @@ import { Card, Stack, NumberInput, Select, Button, Group, TextInput, Alert } fro
 import { useWallets } from '@/context/WalletContext';
 import { API_HOST } from '@/config/config';
 
-export default function TransactionForm() {
+/** Supported transaction types */
+type TransactionType = 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | '';
+
+/** Supported currencies */
+type Currency = 'EUR' | 'CZK';
+
+/** Structure of the transaction form data */
+interface TransactionFormData {
+    transactionType: TransactionType;
+    senderWalletId?: string;
+    receiverWalletId?: string;
+    bankCode: string;
+    accountNumber: string;
+    amount: number | '';
+    currency: Currency;
+}
+
+/**
+ * TransactionForm Component
+ *
+ * A form for creating deposit, withdrawal, and transfer transactions.
+ *
+ * @returns {JSX.Element} The transaction form UI
+ */
+export default function TransactionForm(): JSX.Element {
     const { wallets } = useWallets();
 
-    const [formData, setFormData] = useState({
-        transactionType: '' as 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | '',
-        senderWalletId: undefined as string | undefined,
-        receiverWalletId: undefined as string | undefined,
+    const [formData, setFormData] = useState<TransactionFormData>({
+        transactionType: '',
+        senderWalletId: undefined,
+        receiverWalletId: undefined,
         bankCode: '',
         accountNumber: '',
-        amount: '' as number | '',
+        amount: '',
         currency: 'EUR',
     });
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const handleInputChange = (field: keyof typeof formData, value: any) => {
+    /**
+     * Updates form field values.
+     *
+     * @param {keyof TransactionFormData} field - The field to update
+     * @param {TransactionFormData[keyof TransactionFormData]} value - The new value
+     */
+    const handleInputChange = <K extends keyof TransactionFormData>(field: K, value: TransactionFormData[K]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleTransactionTypeChange = (value: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | '') => {
+    /**
+     * Resets form fields when transaction type changes.
+     *
+     * @param {TransactionType} value - The selected transaction type
+     */
+    const handleTransactionTypeChange = (value: TransactionType) => {
         setFormData({
             transactionType: value,
             senderWalletId: undefined,
@@ -36,36 +71,25 @@ export default function TransactionForm() {
         });
     };
 
-    const handleSendTransaction = async () => {
+    /**
+     * Sends a transaction request to the API.
+     */
+    const handleSendTransaction = async (): Promise<void> => {
         const { transactionType, senderWalletId, receiverWalletId, bankCode, accountNumber, amount, currency } = formData;
 
-        if (!transactionType || amount === '') {
-            setError('Please fill in all required fields.');
-            return;
-        }
-
-        if (amount <= 0) {
-            setError('Amount must be greater than 0.');
+        if (!transactionType || amount === '' || amount <= 0) {
+            setError('Please fill in all required fields with valid values.');
             return;
         }
 
         let apiUrl = '';
-        let requestBody: any = {};
+        let requestBody: Record<string, unknown> = {};
 
         if (transactionType === 'DEPOSIT') {
             if (!receiverWalletId) {
                 setError('Deposit requires a receiver wallet.');
                 return;
             }
-            if (!/^\d{4,6}$/.test(bankCode)) {
-                setError('Bank Code must be 4-6 digits.');
-                return;
-            }
-            if (!/^\d{10,18}$/.test(accountNumber)) {
-                setError('Account Number must be 10-18 digits.');
-                return;
-            }
-
             apiUrl = `${API_HOST}/wallet/deposit`;
             requestBody = { walletId: receiverWalletId, currency, accountNumber, bankCode, amount };
         } else if (transactionType === 'WITHDRAWAL') {
@@ -73,15 +97,6 @@ export default function TransactionForm() {
                 setError('Withdrawal requires a sender wallet.');
                 return;
             }
-            if (!/^\d{4,6}$/.test(bankCode)) {
-                setError('Bank Code must be 4-6 digits.');
-                return;
-            }
-            if (!/^\d{10,18}$/.test(accountNumber)) {
-                setError('Account Number must be 10-18 digits.');
-                return;
-            }
-
             apiUrl = `${API_HOST}/wallet/withdraw`;
             requestBody = { walletId: senderWalletId, currency, accountNumber, bankCode, amount };
         } else if (transactionType === 'TRANSFER') {
@@ -111,19 +126,9 @@ export default function TransactionForm() {
             }
 
             setSuccessMessage(`Transaction successful: ${transactionType}`);
-
-            setFormData((prev) => ({
-                transactionType: prev.transactionType,
-                senderWalletId: undefined,
-                receiverWalletId: undefined,
-                bankCode: '',
-                accountNumber: '',
-                amount: '',
-                currency: 'EUR',
-            }));
-
-        } catch (error: any) {
-            setError(error.message);
+            handleTransactionTypeChange(transactionType);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
         } finally {
             setLoading(false);
         }
@@ -144,7 +149,7 @@ export default function TransactionForm() {
                         { value: 'TRANSFER', label: 'Transfer' },
                     ]}
                     value={formData.transactionType}
-                    onChange={(val) => handleTransactionTypeChange(val as 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER')}
+                    onChange={(val) => handleTransactionTypeChange(val as TransactionType)}
                     required
                 />
 
@@ -156,11 +161,11 @@ export default function TransactionForm() {
                         { value: 'CZK', label: 'Czech Crown (CZK)' },
                     ]}
                     value={formData.currency}
-                    onChange={(val) => handleInputChange('currency', val)}
+                    onChange={(val) => handleInputChange('currency', val as Currency)}
                     required
                 />
 
-                {formData.transactionType === 'WITHDRAWAL' || formData.transactionType === 'TRANSFER' ? (
+                {(formData.transactionType === 'WITHDRAWAL' || formData.transactionType === 'TRANSFER') && (
                     <Select
                         label="Sender Wallet"
                         placeholder="Select sender wallet"
@@ -172,9 +177,9 @@ export default function TransactionForm() {
                         onChange={(val) => handleInputChange('senderWalletId', val || undefined)}
                         required
                     />
-                ) : null}
+                )}
 
-                {formData.transactionType === 'DEPOSIT' || formData.transactionType === 'TRANSFER' ? (
+                {(formData.transactionType === 'DEPOSIT' || formData.transactionType === 'TRANSFER') && (
                     <Select
                         label="Receiver Wallet"
                         placeholder="Select receiver wallet"
@@ -186,7 +191,7 @@ export default function TransactionForm() {
                         onChange={(val) => handleInputChange('receiverWalletId', val || undefined)}
                         required
                     />
-                ) : null}
+                )}
 
                 {formData.transactionType !== 'TRANSFER' && (
                     <>

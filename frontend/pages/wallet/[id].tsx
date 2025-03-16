@@ -1,29 +1,44 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Container, Title, Text, Card, Loader } from '@mantine/core';
+import { Container, Title, Text, Card, Loader, Alert } from '@mantine/core';
 import TransactionHistory from '@/components/TransactionHistory';
 import { API_HOST } from '@/config/config';
 
+/** Supported currency types */
+type Currency = 'EUR' | 'CZK';
+
+/** Wallet interface */
 interface Wallet {
     id: string;
     name: string;
-    currency: string;
+    currency: Currency;
     balance: number;
 }
 
-export default function WalletDetailPage() {
+/**
+ * WalletDetailPage Component
+ *
+ * Displays details of a selected wallet and its transaction history.
+ *
+ * @returns {JSX.Element} The wallet details page
+ */
+export default function WalletDetailPage(): JSX.Element {
     const router = useRouter();
     const { id } = router.query; // Get wallet ID from URL
 
     const [wallet, setWallet] = useState<Wallet | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Fetch wallet details from the backend
+    /**
+     * Fetches wallet details from the backend.
+     */
     useEffect(() => {
         if (!id || typeof id !== 'string') return;
 
         const fetchWalletDetails = async () => {
             setLoading(true);
+            setError(null);
 
             try {
                 const response = await fetch(`${API_HOST}/wallet/get?walletId=${id}`);
@@ -32,10 +47,11 @@ export default function WalletDetailPage() {
                     throw new Error('Failed to fetch wallet details');
                 }
 
-                const data = await response.json();
+                const data: Wallet = await response.json();
                 setWallet(data);
-            } catch {
-                setWallet(null); // Ensure error leads to "Wallet Not Found"
+            } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+                setWallet(null);
             } finally {
                 setLoading(false);
             }
@@ -48,6 +64,14 @@ export default function WalletDetailPage() {
         return (
             <Container>
                 <Loader />
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container>
+                <Alert color="red">{error}</Alert>
             </Container>
         );
     }
