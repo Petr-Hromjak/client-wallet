@@ -1,0 +1,9 @@
+com.clientwallet
+com.clientwallet.controller
+com.clientwallet.dto.wallet
+com.clientwallet.exception
+com.clientwallet.exception.wallet
+com.clientwallet.model
+com.clientwallet.repository
+com.clientwallet.service
+com.clientwallet.validation
