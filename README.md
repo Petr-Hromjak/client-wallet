@@ -42,7 +42,7 @@ docker-compose up --build
 
 ## 📜 Documentation
 - **Backend Documentation (JavaDoc):** Open `backend/documentation/index.html` in a browser.
-- **Frontend Documentation (JSDoc):** Open `frontend/documentation/index.html` in a browser.
+- **Frontend Documentation (JSDoc):** Unable to generate JSDoc from files, but it is propperly filled.
 
 ---
 
