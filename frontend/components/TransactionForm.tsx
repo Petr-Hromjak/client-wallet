@@ -131,7 +131,7 @@ export default function TransactionForm() {
 
     return (
         <Card shadow="sm" padding="lg">
-            <Stack spacing="md">
+            <Stack gap="md">
                 {error && <Alert color="red">{error}</Alert>}
                 {successMessage && <Alert color="green">{successMessage}</Alert>}
 
@@ -216,7 +216,7 @@ export default function TransactionForm() {
                     required
                 />
 
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button onClick={handleSendTransaction} variant="outline" loading={loading}>
                         Send Transaction
                     </Button>

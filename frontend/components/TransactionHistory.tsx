@@ -61,7 +61,7 @@ export default function TransactionHistory({ currentWalletId }: TransactionHisto
     }
 
     return (
-        <Stack mt="xl" spacing="md">
+        <Stack mt="xl" gap="md">
             <Title order={3}>Transaction History</Title>
 
             {transactions.map((transaction) => {

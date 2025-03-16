@@ -46,7 +46,7 @@ export default function CreateWalletForm() {
 
     return (
         <Card shadow="sm" padding="lg">
-            <Stack spacing="md">
+            <Stack gap="md">
                 {error && <Alert color="red">{error}</Alert>}
                 {success && <Alert color="green">{success}</Alert>}
 

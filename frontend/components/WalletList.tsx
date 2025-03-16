@@ -7,7 +7,7 @@ export default function WalletList() {
     const router = useRouter();
 
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <Title order={3}>Wallets</Title>
 
             {loading && wallets.length === 0 && <Loader size="sm" />}

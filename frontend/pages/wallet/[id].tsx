@@ -73,7 +73,7 @@ export default function WalletDetailPage() {
                     </Text>
                 </Card>
             </Container>
-            <TransactionHistory transactions={[]} currentWalletId={wallet.id} />
+            <TransactionHistory currentWalletId={wallet.id} />
         </>
     );
 }
