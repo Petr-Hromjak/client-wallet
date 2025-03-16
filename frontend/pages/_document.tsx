@@ -9,7 +9,7 @@ import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
  *
  * @returns {JSX.Element} The document structure
  */
-export default function Document(): JSX.Element {
+export default function Document() {
     return (
         <Html lang="en" {...mantineHtmlProps}>
             <Head>

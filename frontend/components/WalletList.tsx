@@ -20,7 +20,7 @@ interface Wallet {
  *
  * @returns {JSX.Element} The wallet list UI.
  */
-export default function WalletList(): JSX.Element {
+export default function WalletList() {
     const { wallets, loading, error } = useWallets();
     const router = useRouter();
 
@@ -41,10 +41,8 @@ export default function WalletList(): JSX.Element {
                         style={{
                             cursor: 'pointer',
                             transition: 'background-color 0.2s ease-in-out',
+                            '&:hover': { backgroundColor: '#f5f5f5' },
                         }}
-                        sx={(theme) => ({
-                            '&:hover': { backgroundColor: theme.colors.gray[1] },
-                        })}
                     >
                         <Text>
                             <strong>Name:</strong> {wallet.name}

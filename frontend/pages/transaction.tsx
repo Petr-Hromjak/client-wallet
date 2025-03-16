@@ -10,7 +10,7 @@ import { WalletProvider } from '@/context/WalletContext';
  *
  * @returns {JSX.Element} The transaction page UI
  */
-export default function TransactionPage(): JSX.Element {
+export default function TransactionPage() {
     return (
         <Container size="sm" py="xl">
             <Title order={2} mb="lg">

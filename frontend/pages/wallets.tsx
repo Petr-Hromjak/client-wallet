@@ -11,7 +11,7 @@ import { WalletProvider } from '@/context/WalletContext';
  *
  * @returns {JSX.Element} The wallet page UI
  */
-export default function WalletPage(): JSX.Element {
+export default function WalletPage(){
     return (
         <WalletProvider>
             <Container size="sm" py="xl">
@@ -20,13 +20,10 @@ export default function WalletPage(): JSX.Element {
                 </Title>
                 <CreateWalletForm />
             </Container>
-
-            <Container size="sm" py="xl">
-                <Title order={2} mb="lg">
-                    Wallet List
-                </Title>
-                <WalletList />
-            </Container>
+            <Title order={2} mb="lg">
+                Wallet List
+            </Title>
+            <WalletList />
         </WalletProvider>
     );
 }

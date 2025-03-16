@@ -6,7 +6,7 @@ import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
 /** Navigation links for the sidebar */
 const navLinks: { label: string; href: string }[] = [
     { label: 'Wallets', href: '/wallets' },
-    { label: 'Transactions', href: '/transactions' }, // Fixed plural naming
+    { label: 'Transaction', href: '/transaction' }, // Fixed plural naming
 ];
 
 /**

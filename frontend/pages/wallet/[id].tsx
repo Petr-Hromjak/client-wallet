@@ -22,7 +22,7 @@ interface Wallet {
  *
  * @returns {JSX.Element} The wallet details page
  */
-export default function WalletDetailPage(): JSX.Element {
+export default function WalletDetailPage(){
     const router = useRouter();
     const { id } = router.query; // Get wallet ID from URL
 

@@ -7,7 +7,7 @@ import { Sun, Moon } from 'lucide-react';
  *
  * @returns {JSX.Element} The color scheme toggle component.
  */
-export function ColorSchemeToggle(): JSX.Element {
+export function ColorSchemeToggle() {
     const { colorScheme, setColorScheme } = useMantineColorScheme();
     const isDark: boolean = colorScheme === 'dark';
 

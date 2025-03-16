@@ -40,7 +40,7 @@ interface TransactionHistoryProps {
  * @param {TransactionHistoryProps} props - The component props
  * @returns {JSX.Element} Transaction history list
  */
-export default function TransactionHistory({ currentWalletId }: TransactionHistoryProps): JSX.Element {
+export default function TransactionHistory({ currentWalletId }: TransactionHistoryProps) {
     const theme = useMantineTheme();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState<boolean>(true);

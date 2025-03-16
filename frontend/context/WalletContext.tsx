@@ -38,7 +38,7 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
  * @param {ReactNode} props.children - Child components
  * @returns {JSX.Element} The WalletProvider component
  */
-export const WalletProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const [wallets, setWallets] = useState<Wallet[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
