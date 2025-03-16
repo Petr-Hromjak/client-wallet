@@ -1,65 +1,92 @@
--- Insert User Data
-INSERT INTO "user" (id, name, surname, email, password) VALUES
-                                                            (uuid_generate_v4(), 'Alice', 'Johnson', 'alice.johnson@example.com', 'password123'),
-                                                            (uuid_generate_v4(), 'Bob', 'Smith', 'bob.smith@example.com', 'password456'),
-                                                            (uuid_generate_v4(), 'Charlie', 'Brown', 'charlie.brown@example.com', 'password789'),
-                                                            (uuid_generate_v4(), 'Diana', 'Prince', 'diana.prince@example.com', 'password101'),
-                                                            (uuid_generate_v4(), 'Eve', 'Adams', 'eve.adams@example.com', 'password202');
+-- Insert Wallet Data
+INSERT INTO wallet (id, currency, balance, created_at, updated_at, name)
+VALUES (uuid_generate_v4(), 'EUR', 1000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Savings Wallet'),
+       (uuid_generate_v4(), 'EUR', 2000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Travel Wallet'),
+       (uuid_generate_v4(), 'CZK', 1500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Business Wallet'),
+       (uuid_generate_v4(), 'EUR', 500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Emergency Wallet'),
+       (uuid_generate_v4(), 'CZK', 2500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Investment Wallet'),
+       (uuid_generate_v4(), 'CZK', 3000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Home Savings Wallet');
 
--- Insert Wallet Data (Associating users with wallets)
-INSERT INTO wallet (id, user_id, currency, balance) VALUES
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'alice.johnson@example.com'), 'EUR', 1250.75),
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'alice.johnson@example.com'), 'CZK', 1250.75),
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'bob.smith@example.com'), 'CZK', 35600.50),
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'bob.smith@example.com'), 'EUR', 3600.50),
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'charlie.brown@example.com'), 'CZK', 980.00),
-                                                        (uuid_generate_v4(), (SELECT id FROM "user" WHERE email = 'diana.prince@example.com'), 'EUR', 520.00);
 
 -- Insert Transaction Data
--- With IBAN for deposits and withdrawals, and without IBAN for transfers
+-- With account_number and bank_code for deposits and withdrawals, and without it for transfers
 
--- 1. Deposit Transaction (Alice deposits money from Bank A to her EUR wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), NULL, (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'alice.johnson@example.com') AND currency = 'EUR'),
-     'DE89370400440532013000', 500.00, 'deposit', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 1. Deposit Transaction (Depositing money into the "Savings Wallet" from Bank A)
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           NULL,
+           (SELECT id FROM wallet WHERE name = 'Savings Wallet'),
+           '123456789012', '1100',
+           500.00, 'EUR', 'DEPOSIT', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 2. Withdrawal Transaction (Bob withdraws money from his EUR wallet to Bank B)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'bob.smith@example.com') AND currency = 'EUR'),
-     NULL, 'GB29NWBK60161331926819', 1000.00, 'withdrawal', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 2. Withdrawal Transaction (Withdrawing money from "Travel Wallet" to Bank B)
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           (SELECT id FROM wallet WHERE name = 'Travel Wallet'),
+           NULL,
+           '987654321098', '2200',
+           1000.00, 'EUR', 'WITHDRAWAL', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 3. Transfer Transaction (Charlie transfers from CZK wallet to Diana's EUR wallet)
--- No IBAN involved in this transfer (wallet-to-wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'charlie.brown@example.com') AND currency = 'CZK'),
-     (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'diana.prince@example.com') AND currency = 'EUR'),
-     NULL, 200.00, 'transfer', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 3. Transfer Transaction (Transferring from "Business Wallet" to "Emergency Wallet")
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           (SELECT id FROM wallet WHERE name = 'Business Wallet'),
+           (SELECT id FROM wallet WHERE name = 'Emergency Wallet'),
+           NULL, NULL,
+           200.00, 'CZK', 'TRANSFER', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 4. Transfer Transaction (Eve transfers from CZK wallet to Bob's CZK wallet)
--- No IBAN involved in this transfer (wallet-to-wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'eve.adams@example.com') AND currency = 'CZK'),
-     (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'bob.smith@example.com') AND currency = 'CZK'),
-     NULL, 1500.00, 'transfer', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 4. Transfer Transaction (Transferring from "Investment Wallet" to "Home Savings Wallet")
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           (SELECT id FROM wallet WHERE name = 'Investment Wallet'),
+           (SELECT id FROM wallet WHERE name = 'Home Savings Wallet'),
+           NULL, NULL,
+           1500.00, 'CZK', 'TRANSFER', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 5. Deposit Transaction (Diana deposits money from Bank D to her EUR wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), NULL, (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'diana.prince@example.com') AND currency = 'EUR'),
-     'IT60X0542811101000000123456', 1000.00, 'deposit', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 5. Deposit Transaction (Depositing money into the "Travel Wallet" from Bank C)
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           NULL,
+           (SELECT id FROM wallet WHERE name = 'Travel Wallet'),
+           '654321098765', '3300',
+           1000.00, 'EUR', 'DEPOSIT', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 6. Withdrawal Transaction (Alice withdraws money from her CZK wallet to Bank E)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'alice.johnson@example.com') AND currency = 'CZK'),
-     NULL, 'FR7630006000011234567890189', 350.00, 'withdrawal', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 6. Withdrawal Transaction (Withdrawing money from "Business Wallet" to Bank D)
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           (SELECT id FROM wallet WHERE name = 'Business Wallet'),
+           NULL,
+           '321654987654', '4400',
+           350.00, 'CZK', 'WITHDRAWAL', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 7. Transfer Transaction (Bob transfers from EUR wallet to Charlie's CZK wallet)
--- No IBAN involved in this transfer (wallet-to-wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'bob.smith@example.com') AND currency = 'EUR'),
-     (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'charlie.brown@example.com') AND currency = 'CZK'),
-     NULL, 1000.00, 'transfer', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 7. Transfer Transaction (Transferring from "Savings Wallet" to "Investment Wallet")
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           (SELECT id FROM wallet WHERE name = 'Savings Wallet'),
+           (SELECT id FROM wallet WHERE name = 'Investment Wallet'),
+           NULL, NULL,
+           1000.00, 'EUR', 'TRANSFER', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );
 
--- 8. Deposit Transaction (Eve deposits money from Bank F to her EUR wallet)
-INSERT INTO transaction (id, sender_wallet_id, recipient_wallet_id, iban, amount, transaction_type, transaction_status, created_at, updated_at) VALUES
-    (uuid_generate_v4(), NULL, (SELECT id FROM wallet WHERE user_id = (SELECT id FROM "user" WHERE email = 'eve.adams@example.com') AND currency = 'EUR'),
-     'GB11NWBK60161331926820', 800.00, 'deposit', 'completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 8. Deposit Transaction (Depositing money into "Emergency Wallet" from Bank E)
+INSERT INTO transaction (id, sender_wallet_id, receiver_wallet_id, account_number, bank_code, amount, currency, transaction_type, transaction_status, created_at, updated_at)
+VALUES (
+           uuid_generate_v4(),
+           NULL,
+           (SELECT id FROM wallet WHERE name = 'Emergency Wallet'),
+           '987123654321', '5500',
+           800.00, 'EUR', 'DEPOSIT', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       );

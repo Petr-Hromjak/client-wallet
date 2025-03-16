@@ -6,15 +6,15 @@ CREATE TYPE currency_type AS ENUM ('EUR', 'CZK');
 
 -- Transaction Type Enum
 CREATE TYPE transaction_type AS ENUM (
-    'deposit',
-    'withdrawal',
-    'transfer'
+    'DEPOSIT',
+    'WITHDRAWAL',
+    'TRANSFER'
     );
 
 -- Transaction Status Enum
 CREATE TYPE transaction_status AS ENUM (
-    'pending',
-    'completed',
-    'failed'
+    'PENDING',
+    'COMPLETED',
+    'FAILED'
     );
 
