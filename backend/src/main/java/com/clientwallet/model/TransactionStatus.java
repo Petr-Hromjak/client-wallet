@@ -10,7 +10,6 @@ package com.clientwallet.model;
  *   <li>{@link #COMPLETED}: The transaction has been successfully completed.</li>
  *   <li>{@link #FAILED}: The transaction has failed due to some error or issue.</li>
  * </ul>
- * </p>
  */
 public enum TransactionStatus {
 
